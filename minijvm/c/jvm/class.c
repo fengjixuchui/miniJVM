@@ -214,7 +214,7 @@ s32 class_prepar(Instance *loader, JClass *clazz, Runtime *runtime) {
         jvm_runtime_cache->thread_stackFrame = fi;
     } else if (utf8_equals_c(clazz->name, STR_CLASS_JAVA_LANG_STACKTRACE)) {
         FieldInfo *fi;
-        fi = find_fieldInfo_by_name_c(STR_CLASS_JAVA_LANG_STACKTRACE, "declaringClass", STR_INS_JAVA_LANG_CLASS, NULL, runtime);
+        fi = find_fieldInfo_by_name_c(STR_CLASS_JAVA_LANG_STACKTRACE, "declaringClass", STR_INS_JAVA_LANG_STRING, NULL, runtime);
         jvm_runtime_cache->stacktrace_declaringClass = fi;
         fi = find_fieldInfo_by_name_c(STR_CLASS_JAVA_LANG_STACKTRACE, "methodName", STR_INS_JAVA_LANG_STRING, NULL, runtime);
         jvm_runtime_cache->stacktrace_methodName = fi;
@@ -224,6 +224,8 @@ s32 class_prepar(Instance *loader, JClass *clazz, Runtime *runtime) {
         jvm_runtime_cache->stacktrace_lineNumber = fi;
         fi = find_fieldInfo_by_name_c(STR_CLASS_JAVA_LANG_STACKTRACE, "parent", STR_INS_JAVA_LANG_STACKTRACEELEMENT, NULL, runtime);
         jvm_runtime_cache->stacktrace_parent = fi;
+        fi = find_fieldInfo_by_name_c(STR_CLASS_JAVA_LANG_STACKTRACE, "declaringClazz", STR_INS_JAVA_LANG_CLASS, NULL, runtime);
+        jvm_runtime_cache->stacktrace_declaringClazz = fi;
     } else if (utf8_equals_c(clazz->name, STR_CLASS_ORG_MINI_REFLECT_DIRECTMEMOBJ)) {
         FieldInfo *fi;
         fi = find_fieldInfo_by_name_c(STR_CLASS_ORG_MINI_REFLECT_DIRECTMEMOBJ, "memAddr", "J", NULL, runtime);
@@ -488,6 +490,10 @@ FieldInfo *find_fieldInfo_by_name(Utf8String *clsName, Utf8String *fieldName, Ut
 //    if (utf8_equals_c(clsName, "espresso/parser/JavaParser")&&utf8_equals_c(fieldName, "methodNode_d")) {
 //        int debug = 1;
 //    }
+    if (!other) {
+        jvm_printf("field not exist :%s.%s%s\n", utf8_cstr(clsName), utf8_cstr(fieldName), utf8_cstr(fieldType));
+        return NULL;
+    }
 
     while (fi == NULL && other) {
         FieldPool *fp = &(other->fieldPool);
@@ -557,6 +563,10 @@ MethodInfo *find_methodInfo_by_name_c(c8 *pclsName, c8 *pmethodName, c8 *pmethod
 MethodInfo *find_methodInfo_by_name(Utf8String *clsName, Utf8String *methodName, Utf8String *methodType, Instance *jloader, Runtime *runtime) {
     MethodInfo *mi = NULL;
     JClass *other = classes_load_get_without_resolve(jloader, clsName, runtime);
+    if (!other) {
+        jvm_printf("method not exist :%s.%s%s\n", utf8_cstr(clsName), utf8_cstr(methodName), utf8_cstr(methodType));
+        return NULL;
+    }
 
     while (mi == NULL && other) {
         MethodPool *fp = &(other->methodPool);

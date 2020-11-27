@@ -7,7 +7,6 @@ import org.mini.reflect.vm.RefNative;
 class ByteBufferImpl extends ByteBuffer {
     protected byte[] array;
 
-    protected final long address;
     int baseOffset;
 
     protected ByteBufferImpl(byte[] arr, int start, int length, boolean readOnly) {
@@ -37,10 +36,6 @@ class ByteBufferImpl extends ByteBuffer {
         return b;
     }
 
-    @Override
-    public ShortBuffer asShortBuffer() {
-        return null;
-    }
 
     public ByteBuffer slice() {
         return new ByteBufferImpl(array, position, remaining(), false);
@@ -373,6 +368,58 @@ class ByteBufferImpl extends ByteBuffer {
 
 
     @Override
+    public ShortBuffer asShortBuffer() {
+        return new ShortBuffer() {
+
+            @Override
+            public ShortBuffer asReadOnlyBuffer() {
+                return ByteBufferImpl.this.asReadOnlyBuffer().asShortBuffer();
+            }
+
+            @Override
+            public ShortBuffer slice() {
+                return ByteBufferImpl.this.slice().asShortBuffer();
+            }
+
+            @Override
+            protected void doPut(int pos, short value) {
+                ByteBufferImpl.this.putShort(pos * 2, value);
+            }
+
+            @Override
+            public ShortBuffer put(short[] src, int pos, int length) {
+                if (src == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= src.length || pos + length > src.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    ByteBufferImpl.this.putShort(src[i]);
+                }
+                return this;
+            }
+
+            @Override
+            protected short doGet(int pos) {
+                return ByteBufferImpl.this.getShort(pos * 2);
+            }
+
+            @Override
+            public ShortBuffer get(short[] dst, int pos, int length) {
+                if (dst == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= dst.length || pos + length > dst.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    dst[i] = ByteBufferImpl.this.getShort();
+                }
+                return this;
+            }
+        };
+    }
+
+    @Override
     public CharBuffer asCharBuffer() {
         return new CharBuffer() {
 
@@ -406,7 +453,7 @@ class ByteBufferImpl extends ByteBuffer {
 
             @Override
             protected char doGet(int pos) {
-                return ByteBufferImpl.this.getChar(pos * 4);
+                return ByteBufferImpl.this.getChar(pos * 2);
             }
 
             @Override
@@ -426,7 +473,54 @@ class ByteBufferImpl extends ByteBuffer {
 
     @Override
     public DoubleBuffer asDoubleBuffer() {
-        return null;
+        return new DoubleBuffer() {
+
+            @Override
+            public DoubleBuffer asReadOnlyBuffer() {
+                return ByteBufferImpl.this.asReadOnlyBuffer().asDoubleBuffer();
+            }
+
+            @Override
+            public DoubleBuffer slice() {
+                return ByteBufferImpl.this.slice().asDoubleBuffer();
+            }
+
+            @Override
+            protected void doPut(int pos, double value) {
+                ByteBufferImpl.this.putDouble(pos * 8, value);
+            }
+
+            @Override
+            public DoubleBuffer put(double[] src, int pos, int length) {
+                if (src == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= src.length || pos + length > src.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    ByteBufferImpl.this.putDouble(src[i]);
+                }
+                return this;
+            }
+
+            @Override
+            protected double doGet(int pos) {
+                return ByteBufferImpl.this.getDouble(pos * 8);
+            }
+
+            @Override
+            public DoubleBuffer get(double[] dst, int pos, int length) {
+                if (dst == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= dst.length || pos + length > dst.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    dst[i] = ByteBufferImpl.this.getDouble();
+                }
+                return this;
+            }
+        };
     }
 
     @Override
@@ -535,7 +629,54 @@ class ByteBufferImpl extends ByteBuffer {
 
     @Override
     public LongBuffer asLongBuffer() {
-        return null;
+        return new LongBuffer() {
+
+            @Override
+            public LongBuffer asReadOnlyBuffer() {
+                return ByteBufferImpl.this.asReadOnlyBuffer().asLongBuffer();
+            }
+
+            @Override
+            public LongBuffer slice() {
+                return ByteBufferImpl.this.slice().asLongBuffer();
+            }
+
+            @Override
+            protected void doPut(int pos, long value) {
+                ByteBufferImpl.this.putLong(pos * 8, value);
+            }
+
+            @Override
+            public LongBuffer put(long[] src, int pos, int length) {
+                if (src == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= src.length || pos + length > src.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    ByteBufferImpl.this.putLong(src[i]);
+                }
+                return this;
+            }
+
+            @Override
+            protected long doGet(int pos) {
+                return ByteBufferImpl.this.getLong(pos * 8);
+            }
+
+            @Override
+            public LongBuffer get(long[] dst, int pos, int length) {
+                if (dst == null) {
+                    throw new NullPointerException();
+                } else if (pos < 0 || pos >= dst.length || pos + length > dst.length) {
+                    throw new IndexOutOfBoundsException();
+                }
+                for (int i = pos; i < pos + length; i++) {
+                    dst[i] = ByteBufferImpl.this.getLong();
+                }
+                return this;
+            }
+        };
     }
 
 
